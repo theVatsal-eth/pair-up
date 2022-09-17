@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, MouseEventHandler } from 'react';
 import { firestore } from '../firebase';
 import { setDoc, onSnapshot } from 'firebase/firestore';
 
@@ -14,18 +14,25 @@ import {
 } from '@firebase/firestore';
 
 const Quiz = () => {
+  
   const [questions, setQuestions] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
+  
   const [loading, setLoading] = useState<boolean>(true);
+  
   const [input, setInput] = useState<String>('ahmad');
+  
   const [username, setUsername] = useState<String>('');
+  
   const [challenges, setChallenges] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
+  
   const [students, setStudents] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
+  
   const [quizz, setQuizz] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
 
   const [c, setC] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
@@ -46,7 +53,7 @@ const Quiz = () => {
       limit(10)
     );
     const querySnapshot = await getDocs(studentstQuery);
-    const result = [];
+    const result: QueryDocumentSnapshot<DocumentData>[] = [];
     querySnapshot.forEach((snapshot) => {
       result.push(snapshot);
     });
@@ -57,19 +64,19 @@ const Quiz = () => {
   const getQuizz = async () => {
     const quizzQuery = query(quizzCollection, limit(1));
     const querySnapshot = await getDocs(quizzQuery);
-    const result = [];
+    const result: QueryDocumentSnapshot<DocumentData>[] = [];
     querySnapshot.forEach((snapshot) => {
       result.push(snapshot);
     });
     setQuestions(result);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     setUsername(input);
   };
 
-  const loadQuizz = async (e, level) => {
+  const loadQuizz = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent> , level:string) => {
     // const quizzQuery = query(
     //   quizzCollection,
     //   where('level', '==', level),

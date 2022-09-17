@@ -2,13 +2,13 @@ import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
 import Quiz from '../components/Quiz';
 import Navbar from '../components/Navbar';
-import LevelSelect from '../components/LevelSelect';
+import Home from '../components/Home';
 
 const Index: NextPage = () => {
   return (
     <div className="flex">
       <Navbar />
-      <LevelSelect />
+      <Home />
       {/* <Quiz /> */}
     </div>
   );

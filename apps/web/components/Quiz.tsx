@@ -125,7 +125,7 @@ const Quiz = () => {
       <button className="btn btn-blue" onClick={(e) => loadQuizz(e, 'hard')}>
         Easy
       </button>
-
+       <img src='./graphicbottomleft.png' />           
       <div className="flex flex-col w-full">
         <div className="flex items-center w-full py-4 pl-5 m-2 ml-0 space-x-2 border-2 cursor-pointer border-white/10 rounded-xl bg-white/5">
           <input type="radio" className="w-6 h-6 bg-black" />

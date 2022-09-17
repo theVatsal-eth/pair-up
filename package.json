@@ -20,6 +20,10 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@thirdweb-dev/react": "^3.0.2",
+    "@thirdweb-dev/sdk": "^3.0.2",
+    "ethers": "^5.7.1"
+  },
   "packageManager": "yarn@1.22.18"
 }

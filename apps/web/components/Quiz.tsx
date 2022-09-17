@@ -93,8 +93,8 @@ const Quiz = () => {
       </form>
 
       <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-        <label className="block uppercase text-xs font-bold mb-2">
-          Challange Friend
+        <label className="block uppercase text-xs font-bold mb-4">
+          Challenge Friend
         </label>
         <div className="relative">
           <select

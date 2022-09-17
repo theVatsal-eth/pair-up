@@ -1,9 +1,13 @@
-import React from 'react'
+import type { NextPage } from 'next';
+import { useEffect, useState } from 'react';
+import Quiz from '../components/Quiz';
 
-const index = () => {
+const Index: NextPage = () => {
   return (
-    <div className='font-extrabold text-4xl '>Hello World!</div>
-  )
-}
+    <div className="">
+      <Quiz />
+    </div>
+  );
+};
 
-export default index
+export default Index;

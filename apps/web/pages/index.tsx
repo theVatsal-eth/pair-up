@@ -1,10 +1,9 @@
-import { Button } from "ui";
+import React from 'react'
 
-export default function Web() {
+const index = () => {
   return (
-    <div>
-      <h1>Web</h1>
-      <Button />
-    </div>
-  );
+    <div className='font-extrabold text-4xl '>Hello World!</div>
+  )
 }
+
+export default index

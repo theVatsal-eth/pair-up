@@ -88,7 +88,7 @@ const Quiz = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <input type="text" onChange={(e) => setInput(e.target.value)} />
+        <input type="text" onChange={(ev) => setInput(e.target.value)} />
         <input type="submit" />
       </form>
 

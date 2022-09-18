@@ -15,20 +15,20 @@ import {
 import Challenge from './Challenge';
 
 interface Props {
-  studentName: string
+  studentName: string;
 }
 
-const Quiz: React.FC<Props> = ({studentName}) => {
+const Quiz: React.FC<Props> = ({ studentName }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [isChallenged, setIsChallenged] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [score, setScore] = useState<number>(0);
-  const [questionId, setQuestionId] = useState<string>('');
-  const [option, setOption] = useState<string>('');
-  const [challengedStudent, setChallengedStudent] = useState<string>();
-  const [isQuizSubmited, setIsQuizSubmited] = useState<boolean>(false);
+  const [isChallenged, setIsChallenged] = useState<Boolean>(true);
+  const [loading, setLoading] = useState<Boolean>(true);
+  const [score, setScore] = useState<Number>(0);
+  const [questionId, setQuestionId] = useState<String>('');
+  const [option, setOption] = useState<String>('');
+  const [challengedStudent, setChallengedStudent] = useState<String>();
+  const [isQuizSubmited, setIsQuizSubmited] = useState<Boolean>(false);
   const [challenges, setChallenges] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
@@ -85,7 +85,7 @@ const Quiz: React.FC<Props> = ({studentName}) => {
   };
 
   const handleChallengeSubmit = async () => {
-    console.log('clicked challenge');
+    console.log('clcked challelj');
     if (question[0]) {
       // console.log(`studentName: ${studentName}`);
       // console.log(`challengedStudent: ${challengedStudent}`);
@@ -96,11 +96,14 @@ const Quiz: React.FC<Props> = ({studentName}) => {
       // console.log(`status: pending`);
 
       // get the current timestamp
-      const timestamp: string = String(Date.now());
+      const timestamp: string = Date.now().toString();
       // create a pointer to our document
       const _challenge = doc(firestore, `challenges/${timestamp}`);
       // structure the todo data
-      let _quesionId = question[0].id;
+      let _quesionId = '';
+      question.forEach((element) => {
+        _quesionId = element.id;
+      });
       const challaengeData = {
         from: studentName,
         to: challengedStudent,
@@ -153,7 +156,7 @@ const Quiz: React.FC<Props> = ({studentName}) => {
         <br />
         <button
           className="btn btn-blue"
-          onClick={() => loadQuestion( 'medium')}>
+          onClick={() => loadQuestion('medium')}>
           Medium
         </button>
         <br />
@@ -173,7 +176,7 @@ const Quiz: React.FC<Props> = ({studentName}) => {
             <div key={data.id} className="flex flex-col gap-y-2">
               <h3>{data.data().value}</h3>
               {data.data().answers &&
-                data.data().answers.map((answer: string) => (
+                data.data().answers.map((answer:string) => (
                   <button
                     onClick={(e) => setOption(answer)}
                     key={answer}

@@ -1,13 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap");
 @tailwind base;
 @tailwind utilities;
 @tailwind components;
+
+
 @layer base {
-    body {
-    @apply bg-[#252525];
-    @apply text-white
+  body {
+    @apply bg-[#252525] text-white;
+  }
 }
-
-
-} 
 

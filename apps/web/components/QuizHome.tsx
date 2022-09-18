@@ -74,7 +74,7 @@ const QuizHome = () => {
           setGameStatusMessage('Congratulation you won');
         } else if (element.data().fromScore < element.data().toScore) {
           setGameStatusMessage('you loss');
-        } else {
+        } else if (element.data().fromScore == element.data().toScore) {
           setGameStatusMessage('score is level');
         }
       });

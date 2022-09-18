@@ -32,25 +32,21 @@ const Challenge = ({ challenges, studentName }) => {
 
   useEffect(() => {
     if (score !== null) {
-      const completeChallange = async () => {
-        const _challenge = doc(firestore, `challenges/${challenges[0].id}`);
-
-        // update the doc by setting done to true
-        await updateDoc(_challenge, {
-          status: 'done',
-          toScore: score,
-        });
-      };
+      console.log('socre challage');
+      console.log(score);
+      const completeChallange = async () => {};
 
       completeChallange();
-      if (score !== null) {
+      if (score !== null && challenges[0]) {
         console.log(challenges[0].data().fromScore);
         console.log(score);
         if (score > parseInt(challenges[0].data().fromScore)) {
           setSolvingAlert('congratulation you won');
           console.log('you can now increment value on the blockchain');
-        } else {
+        } else if (score < challenges[0].data().fromScore) {
           setSolvingAlert('opps you lose');
+        } else if (score == challenges[0].data().fromScore) {
+          setSolvingAlert('socre level');
         }
       }
     }
@@ -61,11 +57,27 @@ const Challenge = ({ challenges, studentName }) => {
   };
 
   const solveChallange = async () => {
-    if (option == question[0].correct) {
+    let _score = 0;
+    if (option == question[0].data().correct) {
+      console.log('correct');
+      _score = 100;
       setScore(100);
     } else {
+      _score = 0;
+      console.log('wrong');
+
       setScore(0);
     }
+
+    console.log('var value' + _score);
+
+    const _challenge = doc(firestore, `challenges/${challenges[0].id}`);
+
+    // update the doc by setting done to true
+    await updateDoc(_challenge, {
+      status: 'done',
+      toScore: parseInt(_score),
+    });
   };
 
   const loadQuestion = async () => {

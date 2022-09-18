@@ -168,7 +168,7 @@ const Quiz: React.FC<Props> = ({ studentName }) => {
         </button>
         <br />
         <br />
-        <button className="btn btn-green">socre: {score}</button>
+        {/* <button className="btn btn-green">socre: {score}</button> */}
         <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
           {/* <form onSubmit={handleQuizSubmit}> */}
           <h1>Quiz</h1>

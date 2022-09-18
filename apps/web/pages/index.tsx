@@ -7,7 +7,7 @@ import Home from '../components/Home';
 const Index: NextPage = () => {
   return (
     <div className="flex">
-      <Navbar />
+      
       <Home />
       {/* <Quiz /> */}
     </div>

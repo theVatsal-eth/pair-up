@@ -5,7 +5,7 @@ import { ChainId, ThirdwebProvider } from "@thirdweb-dev/react";
 const activeChainId = ChainId.Mumbai;
 
 
-const MyApp = ({ Component, pageProps }: AppProps) => {
+const App = ({ Component, pageProps }: AppProps) => {
   return (
     <ThirdwebProvider desiredChainId={activeChainId}>
 
@@ -18,4 +18,4 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   )
 }
 
-export default MyApp
+export default App

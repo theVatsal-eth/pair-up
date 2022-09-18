@@ -14,21 +14,17 @@ import {
 } from '@firebase/firestore';
 import Challenge from './Challenge';
 
-interface Props {
-  studentName: string
-}
-
-const Quiz: React.FC<Props> = ({studentName}) => {
+const Quiz = ({ studentName }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [isChallenged, setIsChallenged] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [score, setScore] = useState<number>(0);
-  const [questionId, setQuestionId] = useState<string>('');
-  const [option, setOption] = useState<string>('');
-  const [challengedStudent, setChallengedStudent] = useState<string>();
-  const [isQuizSubmited, setIsQuizSubmited] = useState<boolean>(false);
+  const [isChallenged, setIsChallenged] = useState<Boolean>(true);
+  const [loading, setLoading] = useState<Boolean>(true);
+  const [score, setScore] = useState<Number>(0);
+  const [questionId, setQuestionId] = useState<String>('');
+  const [option, setOption] = useState<String>('');
+  const [challengedStudent, setChallengedStudent] = useState<String>();
+  const [isQuizSubmited, setIsQuizSubmited] = useState<Boolean>(false);
   const [challenges, setChallenges] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
@@ -68,9 +64,9 @@ const Quiz: React.FC<Props> = ({studentName}) => {
     }
   };
 
-  // const selectedOption = (e) => {
-  //   console.log(e.target.value);
-  // };
+  const selectedOption = (e) => {
+    console.log(e.target.value);
+  };
 
   const handleQuizSubmit = () => {
     setIsQuizSubmited(true);
@@ -85,7 +81,7 @@ const Quiz: React.FC<Props> = ({studentName}) => {
   };
 
   const handleChallengeSubmit = async () => {
-    console.log('clicked challenge');
+    console.log('clcked challelj');
     if (question[0]) {
       // console.log(`studentName: ${studentName}`);
       // console.log(`challengedStudent: ${challengedStudent}`);
@@ -96,11 +92,14 @@ const Quiz: React.FC<Props> = ({studentName}) => {
       // console.log(`status: pending`);
 
       // get the current timestamp
-      const timestamp: string = String(Date.now());
+      const timestamp: string = Date.now().toString();
       // create a pointer to our document
       const _challenge = doc(firestore, `challenges/${timestamp}`);
       // structure the todo data
-      let _quesionId = question[0].id;
+      let _quesionId = '';
+      question.forEach((element) => {
+        _quesionId = element.id;
+      });
       const challaengeData = {
         from: studentName,
         to: challengedStudent,
@@ -121,7 +120,7 @@ const Quiz: React.FC<Props> = ({studentName}) => {
     }
   };
 
-  const loadQuestion = async (level: string) => {
+  const loadQuestion = async (e, level) => {
     console.log('click');
     const questionQuery = query(
       questionCollection,
@@ -146,21 +145,21 @@ const Quiz: React.FC<Props> = ({studentName}) => {
       <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
         <button
           className="btn btn-blue"
-          onClick={() => loadQuestion('easy')}>
+          onClick={(e) => loadQuestion(e, 'easy')}>
           Easy
         </button>
         <br />
         <br />
         <button
           className="btn btn-blue"
-          onClick={() => loadQuestion( 'medium')}>
+          onClick={(e) => loadQuestion(e, 'medium')}>
           Medium
         </button>
         <br />
         <br />
         <button
           className="btn btn-blue"
-          onClick={() => loadQuestion('hard')}>
+          onClick={(e) => loadQuestion(e, 'hard')}>
           Hard
         </button>
         <br />
@@ -173,7 +172,7 @@ const Quiz: React.FC<Props> = ({studentName}) => {
             <div key={data.id} className="flex flex-col gap-y-2">
               <h3>{data.data().value}</h3>
               {data.data().answers &&
-                data.data().answers.map((answer: string) => (
+                data.data().answers.map((answer) => (
                   <button
                     onClick={(e) => setOption(answer)}
                     key={answer}

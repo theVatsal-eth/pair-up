@@ -14,20 +14,15 @@ import {
   updateDoc,
 } from '@firebase/firestore';
 
-interface Props {
-  challenges: QueryDocumentSnapshot<DocumentData>[];
-  studentName: string;
-}
-
-const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
+const Challenge = ({ challenges, studentName }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [score, setScore] = useState<number | null>(null);
+  const [loading, setLoading] = useState<Boolean>(true);
+  const [score, setScore] = useState<Number>(null);
   const [option, setOption] = useState<String>('');
-  const [challangeAlret, setChallengeAlert] = useState<boolean>(true);
-  const [acceptChallenge, setAcceptChallenge] = useState<boolean>(false);
+  const [challangeAlret, setChallengeAlert] = useState<Boolean>(true);
+  const [acceptChallenge, setAcceptChallenge] = useState<Boolean>(false);
   const [solvingAlert, setSolvingAlert] = useState<String>('');
 
   const questionCollection = collection(firestore, 'questions');
@@ -48,31 +43,26 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
         if (score > parseInt(challenges[0].data().fromScore)) {
           setSolvingAlert('congratulation you won');
           console.log('you can now increment value on the blockchain');
-
         } else if (score < challenges[0].data().fromScore) {
-
-        } 
-        else if (score == parseInt(challenges[0].data().fromScore)) {
-          setSolvingAlert("It was a tie!");
-        }
-       else if (score == challenges[0].data().fromScore) {
+          setSolvingAlert('opps you lose');
+        } else if (score == challenges[0].data().fromScore) {
           setSolvingAlert('socre level');
         }
       }
     }
   }, [score]);
 
-  // const selectedOption = (e) => {
-  //   console.log(e.target.value);
-  // };
+  const selectedOption = (e) => {
+    console.log(e.target.value);
+  };
 
   const solveChallange = async () => {
-
     let _score = 0;
     if (option == question[0].data().correct) {
       console.log('correct');
       _score = 100;
- else {
+      setScore(100);
+    } else {
       _score = 0;
       console.log('wrong');
 
@@ -121,10 +111,10 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
       {challangeAlret && (
         <div
           id="alert-border-1"
-          className="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
+          class="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
           role="alert">
           <svg
-            className="flex-shrink-0 w-5 h-5 text-blue-700"
+            class="flex-shrink-0 w-5 h-5 text-blue-700"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg">
@@ -134,20 +124,20 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
               clip-rule="evenodd"></path>
           </svg>
 
-          <div className="ml-3 text-sm font-medium text-blue-700">
+          <div class="ml-3 text-sm font-medium text-blue-700">
             Hey <span className="font-semibold"> {studentName} </span> you are
           </div>
 
           <button
             type="button"
             onClick={onRejectChallange}
-            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span className="sr-only">Dismiss</span>
+            <span class="sr-only">Dismiss</span>
             <svg
               aria-hidden="true"
-              className="w-5 h-5"
+              class="w-5 h-5"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg">
@@ -160,12 +150,12 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
           <button
             type="button"
             onClick={onAcceptChalleng}
-            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span className="sr-only">Dismiss</span>
+            <span class="sr-only">Dismiss</span>
             <svg
-              className="w-6 h-6"
+              class="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -182,10 +172,10 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
       {solvingAlert.length > 0 && (
         <div
           id="alert-border-1"
-          className="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
+          class="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
           role="alert">
           <svg
-            className="flex-shrink-0 w-5 h-5 text-blue-700"
+            class="flex-shrink-0 w-5 h-5 text-blue-700"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg">
@@ -195,19 +185,19 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
               clip-rule="evenodd"></path>
           </svg>
 
-          <div className="ml-3 text-sm font-medium text-blue-700">
+          <div class="ml-3 text-sm font-medium text-blue-700">
             {solvingAlert}
           </div>
 
           <button
             type="button"
-            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span className="sr-only">Dismiss</span>
+            <span class="sr-only">Dismiss</span>
             <svg
               aria-hidden="true"
-              className="w-5 h-5"
+              class="w-5 h-5"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg">
@@ -228,7 +218,7 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
               <div key={data.id} className="flex flex-col gap-y-2">
                 <h3>{data.data().value}</h3>
                 {data.data().answers &&
-                  data.data().answers.map((answer: string) => (
+                  data.data().answers.map((answer) => (
                     <button
                       onClick={(e) => setOption(answer)}
                       key={answer}

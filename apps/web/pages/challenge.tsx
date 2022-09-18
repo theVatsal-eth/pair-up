@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { firestore } from '../firebase';
 import { setDoc, onSnapshot } from 'firebase/firestore';
 
@@ -18,9 +18,10 @@ import { useAddress, useMetamask } from '@thirdweb-dev/react';
 interface Props {
   challenges: QueryDocumentSnapshot<DocumentData>[];
   studentName: string;
+  setIsChallenged: Dispatch<SetStateAction<boolean>>;
 }
 
-const Challenge: React.FC<Props> = () => {
+const Challenge: React.FC<Props> = ({ setIsChallenged }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
@@ -59,7 +60,6 @@ const Challenge: React.FC<Props> = () => {
 
   useEffect(() => {
     if (score !== null) {
-      console.log('socre challage');
       console.log(score);
       const completeChallange = async () => { };
 
@@ -68,12 +68,11 @@ const Challenge: React.FC<Props> = () => {
         console.log(challenges[0].data().fromScore);
         console.log(score);
         if (score > parseInt(challenges[0].data().fromScore)) {
-          setSolvingAlert('congratulation you won');
-          console.log('you can now increment value on the blockchain');
+          setSolvingAlert('You won the challenge! 🥳');
         } else if (score < challenges[0].data().fromScore) {
-          setSolvingAlert('opps you lose');
+          setSolvingAlert('Better luck next time 😞');
         } else if (score == challenges[0].data().fromScore) {
-          setSolvingAlert('socre level');
+          setSolvingAlert('Close Call! 😓');
         }
       }
     }
@@ -81,13 +80,19 @@ const Challenge: React.FC<Props> = () => {
 
   useEffect(() => {
     const unsubscribed = onSnapshot(challengesCollection, (snapshot) => {
-      setChallenges(
-        // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
-        snapshot.docs.filter(
-          (doc) =>
-            doc.data().status == 'pending' && doc.data().to == address
-        )
-      );
+      console.log(address)
+
+      if (address) {
+        setChallenges(
+          // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
+          snapshot.docs.filter(
+            (doc) =>
+            doc.data().status == 'pending' && doc.data().to == address 
+          )
+        );
+      }
+
+      
       setChallengeAlert(true)
 
       console.log('hello khan', challenges);
@@ -103,7 +108,7 @@ const Challenge: React.FC<Props> = () => {
               doc.data().status == 'done' && doc.data().from == address
           )
         );
-        console.log('hello khan 2');
+        console.log('hello khan 2', doneChallenge);
       }
     );
 
@@ -112,6 +117,7 @@ const Challenge: React.FC<Props> = () => {
       unsubscribedCompleted();
     };
   }, [address]);
+  
 
   // const selectedOption = (e) => {
   //   console.log(e.target.value);
@@ -132,22 +138,26 @@ const Challenge: React.FC<Props> = () => {
 
     console.log('var value' + _score);
 
-    const _challenge = doc(firestore, `challenges/${challenges[0].id}`);
+    const _challenge = doc(firestore, `challenges/${challenges[0]?.id}`);
 
     // update the doc by setting done to true
     await updateDoc(_challenge, {
       status: 'done',
       toScore: _score,
     });
+
+    setChallengeAlert(false)
+    setAcceptChallenge(false)
+    setIsChallenged(false)
   };
 
   const loadQuestion = async () => {
-    if (true) {
+    if (challenges[0]) {
 
-      
+      console.log(challenges[0])
       const questionQuery = query(
         questionCollection,
-        where('__name__', '==', challenges[0].data().question_id),
+        where('__name__', '==', challenges[0].data().questionId),
         limit(1)
       );
       const querySnapshot = await getDocs(questionQuery);
@@ -186,7 +196,7 @@ const Challenge: React.FC<Props> = () => {
 
 
           <div className="">
-            Hey <span className="font-semibold"> {address} </span> you are challenged by abc
+            Hey <span className="font-semibold"> {address} </span> you are challenged.
           </div>
 
           <div className='flex gap-28 justify-between'>
@@ -232,6 +242,7 @@ const Challenge: React.FC<Props> = () => {
             type="button"
             className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
+            onClick={() => setSolvingAlert('')}
             aria-label="Close">
             <span className="sr-only">Dismiss</span>
             <svg

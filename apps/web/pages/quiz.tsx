@@ -15,7 +15,7 @@ import {
 } from '@firebase/firestore';
 import Challenge from './challenge';
 import Quiz from '../components/Quiz';
-import { useAddress } from '@thirdweb-dev/react';
+import { ConnectWallet, useAddress } from '@thirdweb-dev/react';
 import User from '../components/User';
 
 
@@ -46,10 +46,10 @@ const QuizHome = () => {
         // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
         snapshot.docs.filter(
           (doc) =>
-            doc.data().status == 'pending' && doc.data().to == studentName
+            doc.data().status == 'pending' && doc.data().to == address
         )
       );
-      console.log('hello khan');
+      console.log('hello khan', challenges);
     });
 
     const unsubscribedCompleted = onSnapshot(
@@ -59,7 +59,7 @@ const QuizHome = () => {
           // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
           snapshot.docs.filter(
             (doc) =>
-              doc.data().status == 'done' && doc.data().from == studentName
+              doc.data().status == 'done' && doc.data().from == address
           )
         );
         console.log('hello khan');
@@ -70,21 +70,8 @@ const QuizHome = () => {
       unsubscribed();
       unsubscribedCompleted();
     };
-  }, [studentName]);
+  }, [address]);
 
-  useEffect(() => {
-    if (doneChallenge.length > 0) {
-      doneChallenge.forEach((element) => {
-        if (element.data().fromScore > element.data().toScore) {
-          setGameStatusMessage('Congratulation you won :D');
-        } else if (element.data().fromScore < element.data().toScore) {
-          setGameStatusMessage('You lost :(');
-        } else if (element.data().fromScore == element.data().toScore) {
-          setGameStatusMessage('A Tie! :)');
-        }
-      });
-    }
-  }, [doneChallenge]);
 
   useEffect(() => {
     if (challenges.length > 0) {
@@ -175,11 +162,18 @@ const QuizHome = () => {
         </div>
       )}
 
-      
-          <div className="flex flex-col gap-y-2">
-            <User/>
-          </div>
-      
+
+      <div className="flex flex-col gap-y-2">
+        {
+          address ? <>
+            {
+              isChallenged ? <Challenge challenges={challenges} studentName={address} setIsChallenged={setChallenges} /> : <Quiz studentName={address} />
+            }
+          </> :  <ConnectWallet accentColor="#6A67E5" colorMode="dark" />
+            }
+
+      </div>
+
     </div>
   );
 };

@@ -1,11 +1,11 @@
 import type { NextPage } from 'next';
 import { useEffect, useState } from 'react';
-import Quiz from '../components/Quiz';
+import QuizHome from '../components/QuizHome';
 
 const Index: NextPage = () => {
   return (
     <div className="">
-      <Quiz />
+      <QuizHome />
     </div>
   );
 };

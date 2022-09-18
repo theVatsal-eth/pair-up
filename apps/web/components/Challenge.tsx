@@ -14,15 +14,20 @@ import {
   updateDoc,
 } from '@firebase/firestore';
 
-const Challenge = ({ challenges, studentName }) => {
+interface Props {
+  challenges: QueryDocumentSnapshot<DocumentData>[];
+  studentName: string;
+}
+
+const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [loading, setLoading] = useState<Boolean>(true);
-  const [score, setScore] = useState<Number>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [score, setScore] = useState<number | null>(null);
   const [option, setOption] = useState<String>('');
-  const [challangeAlret, setChallengeAlert] = useState<Boolean>(true);
-  const [acceptChallenge, setAcceptChallenge] = useState<Boolean>(false);
+  const [challangeAlret, setChallengeAlert] = useState<boolean>(true);
+  const [acceptChallenge, setAcceptChallenge] = useState<boolean>(false);
   const [solvingAlert, setSolvingAlert] = useState<String>('');
 
   const questionCollection = collection(firestore, 'questions');
@@ -43,26 +48,31 @@ const Challenge = ({ challenges, studentName }) => {
         if (score > parseInt(challenges[0].data().fromScore)) {
           setSolvingAlert('congratulation you won');
           console.log('you can now increment value on the blockchain');
+
         } else if (score < challenges[0].data().fromScore) {
-          setSolvingAlert('opps you lose');
-        } else if (score == challenges[0].data().fromScore) {
+
+        } 
+        else if (score == parseInt(challenges[0].data().fromScore)) {
+          setSolvingAlert("It was a tie!");
+        }
+       else if (score == challenges[0].data().fromScore) {
           setSolvingAlert('socre level');
         }
       }
     }
   }, [score]);
 
-  const selectedOption = (e) => {
-    console.log(e.target.value);
-  };
+  // const selectedOption = (e) => {
+  //   console.log(e.target.value);
+  // };
 
   const solveChallange = async () => {
+
     let _score = 0;
     if (option == question[0].data().correct) {
       console.log('correct');
       _score = 100;
-      setScore(100);
-    } else {
+ else {
       _score = 0;
       console.log('wrong');
 
@@ -111,10 +121,10 @@ const Challenge = ({ challenges, studentName }) => {
       {challangeAlret && (
         <div
           id="alert-border-1"
-          class="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
+          className="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
           role="alert">
           <svg
-            class="flex-shrink-0 w-5 h-5 text-blue-700"
+            className="flex-shrink-0 w-5 h-5 text-blue-700"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg">
@@ -124,20 +134,20 @@ const Challenge = ({ challenges, studentName }) => {
               clip-rule="evenodd"></path>
           </svg>
 
-          <div class="ml-3 text-sm font-medium text-blue-700">
+          <div className="ml-3 text-sm font-medium text-blue-700">
             Hey <span className="font-semibold"> {studentName} </span> you are
           </div>
 
           <button
             type="button"
             onClick={onRejectChallange}
-            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span class="sr-only">Dismiss</span>
+            <span className="sr-only">Dismiss</span>
             <svg
               aria-hidden="true"
-              class="w-5 h-5"
+              className="w-5 h-5"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg">
@@ -150,12 +160,12 @@ const Challenge = ({ challenges, studentName }) => {
           <button
             type="button"
             onClick={onAcceptChalleng}
-            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span class="sr-only">Dismiss</span>
+            <span className="sr-only">Dismiss</span>
             <svg
-              class="w-6 h-6"
+              className="w-6 h-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -172,10 +182,10 @@ const Challenge = ({ challenges, studentName }) => {
       {solvingAlert.length > 0 && (
         <div
           id="alert-border-1"
-          class="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
+          className="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
           role="alert">
           <svg
-            class="flex-shrink-0 w-5 h-5 text-blue-700"
+            className="flex-shrink-0 w-5 h-5 text-blue-700"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg">
@@ -185,19 +195,19 @@ const Challenge = ({ challenges, studentName }) => {
               clip-rule="evenodd"></path>
           </svg>
 
-          <div class="ml-3 text-sm font-medium text-blue-700">
+          <div className="ml-3 text-sm font-medium text-blue-700">
             {solvingAlert}
           </div>
 
           <button
             type="button"
-            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span class="sr-only">Dismiss</span>
+            <span className="sr-only">Dismiss</span>
             <svg
               aria-hidden="true"
-              class="w-5 h-5"
+              className="w-5 h-5"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg">
@@ -218,7 +228,7 @@ const Challenge = ({ challenges, studentName }) => {
               <div key={data.id} className="flex flex-col gap-y-2">
                 <h3>{data.data().value}</h3>
                 {data.data().answers &&
-                  data.data().answers.map((answer) => (
+                  data.data().answers.map((answer: string) => (
                     <button
                       onClick={(e) => setOption(answer)}
                       key={answer}

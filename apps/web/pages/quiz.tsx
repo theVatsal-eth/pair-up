@@ -13,8 +13,11 @@ import {
   where,
   deleteDoc,
 } from '@firebase/firestore';
-import Challenge from './Challenge';
-import Quiz from './Quiz';
+import Challenge from './challenge';
+import Quiz from '../components/Quiz';
+import { ConnectWallet, useAddress } from '@thirdweb-dev/react';
+import User from '../components/User';
+
 
 const QuizHome = () => {
   const [isChallenged, setIsChallenged] = useState<boolean>(false);
@@ -35,16 +38,18 @@ const QuizHome = () => {
   const challengesCollection = collection(firestore, 'challenges');
   const studentsCollection = collection(firestore, 'students');
 
+  const address = useAddress()
+
   useEffect(() => {
     const unsubscribed = onSnapshot(challengesCollection, (snapshot) => {
       setChallenges(
         // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
         snapshot.docs.filter(
           (doc) =>
-            doc.data().status == 'pending' && doc.data().to == studentName
+            doc.data().status == 'pending' && doc.data().to == address
         )
       );
-      console.log('hello khan');
+      console.log('hello khan', challenges);
     });
 
     const unsubscribedCompleted = onSnapshot(
@@ -54,7 +59,7 @@ const QuizHome = () => {
           // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
           snapshot.docs.filter(
             (doc) =>
-              doc.data().status == 'done' && doc.data().from == studentName
+              doc.data().status == 'done' && doc.data().from == address
           )
         );
         console.log('hello khan');
@@ -65,21 +70,8 @@ const QuizHome = () => {
       unsubscribed();
       unsubscribedCompleted();
     };
-  }, [studentName]);
+  }, [address]);
 
-  useEffect(() => {
-    if (doneChallenge.length > 0) {
-      doneChallenge.forEach((element) => {
-        if (element.data().fromScore > element.data().toScore) {
-          setGameStatusMessage('Congratulation you won :D');
-        } else if (element.data().fromScore < element.data().toScore) {
-          setGameStatusMessage('You lost :(');
-        } else if (element.data().fromScore == element.data().toScore) {
-          setGameStatusMessage('A Tie! :)');
-        }
-      });
-    }
-  }, [doneChallenge]);
 
   useEffect(() => {
     if (challenges.length > 0) {
@@ -105,6 +97,8 @@ const QuizHome = () => {
         result.push(snapshot);
       });
 
+
+
       setStudents(result);
     } catch (error) {
       console.log(error);
@@ -125,7 +119,7 @@ const QuizHome = () => {
     await deleteDoc(ch);
   };
   return (
-    <div>
+    <div className='flex justify-center'>
       {gameStatusMesage.length > 0 && (
         <div
           id="alert-border-1"
@@ -168,43 +162,38 @@ const QuizHome = () => {
         </div>
       )}
 
-      {studentName ? (
-        <div>
-          <h1>Student name :{studentName}</h1>
-          {isChallenged ? (
-            <Challenge challenges={challenges} studentName={studentName} />
-          ) : (
-            <Quiz studentName={studentName} />
-          )}
-        </div>
-      ) : (
-        <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
-          <h1>Select name</h1>
-          <div className="flex flex-col gap-y-2">
-            {students.map((student) => (
-              <button
-                onClick={(e) => setStudentName(student.data().name)}
-                key={student.id}
-                className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                {student.data().name}
-              </button>
 
-              // <option key={student.id}>{student.data().name}</option>
-            ))}
-          </div>
-        </div>
+      <div className="flex flex-col gap-y-2">
+        {
+          address ? <>
+            {
+              isChallenged ? <Challenge challenges={challenges} studentName={address} setIsChallenged={setChallenges} /> : <Quiz studentName={address} />
+            }
+          </> :  <ConnectWallet accentColor="#6A67E5" colorMode="dark" />
+            }
 
-        // <form className="mt-10" onSubmit={nameSubmit}>
-        //   <input
-        //     onChange={(e) => setInput(e.target.value)}
-        //     className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        //   />
+      </div>
 
-        //   <input type="submit" />
-        // </form>
-      )}
     </div>
   );
 };
 
 export default QuizHome;
+
+
+// const result: string[] = []
+      // students.forEach((student) => {
+        // students.push(student.data().name)
+      // })
+
+
+      // {students.map((student) => (
+      //   <button
+      //     onClick={(e) => setStudentName(student.data().name)}
+      //     key={student.id}
+      //     className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+      //     {student.data().name}
+      //   </button>
+
+      //   // <option key={student.id}>{student.data().name}</option>
+      // ))}

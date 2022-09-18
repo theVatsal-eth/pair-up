@@ -12,7 +12,7 @@ import {
   QueryDocumentSnapshot,
   where,
 } from '@firebase/firestore';
-import Challenge from './Challenge';
+import Challenge from '../pages/challenge';
 
 interface Props {
   studentName: string;
@@ -22,13 +22,15 @@ const Quiz: React.FC<Props> = ({ studentName }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [isChallenged, setIsChallenged] = useState<Boolean>(true);
-  const [loading, setLoading] = useState<Boolean>(true);
-  const [score, setScore] = useState<Number>(0);
-  const [questionId, setQuestionId] = useState<String>('');
-  const [option, setOption] = useState<String>('');
-  const [challengedStudent, setChallengedStudent] = useState<String>();
-  const [isQuizSubmited, setIsQuizSubmited] = useState<Boolean>(false);
+  const [isChallenged, setIsChallenged] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [score, setScore] = useState<number>(0);
+  const [questionId, setQuestionId] = useState<string>('');
+  const [option, setOption] = useState<string>('');
+  const [challengedStudent, setChallengedStudent] = useState<string>();
+  const [isQuizSubmited, setIsQuizSubmited] = useState<boolean>(false);
+  const [level, setLevel] = useState<'easy' | 'medium' | 'hard' | undefined>()
+
   const [challenges, setChallenges] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
@@ -72,8 +74,16 @@ const Quiz: React.FC<Props> = ({ studentName }) => {
   //   console.log(e.target.value);
   // };
 
-  const handleQuizSubmit = () => {
+  const handleQuizSubmit = (challenge: boolean = false) => {
+    if (option.length === 0) {
+      console.log('exiting the function')
+      return
+    }
     setIsQuizSubmited(true);
+
+    if (!challenge) {
+      loadQuestion(level)
+    }
     let correctAnswer = '';
 
     console.log(correctAnswer);
@@ -85,16 +95,8 @@ const Quiz: React.FC<Props> = ({ studentName }) => {
   };
 
   const handleChallengeSubmit = async () => {
-    console.log('clcked challelj');
+    console.log('clicked challenge');
     if (question[0]) {
-      // console.log(`studentName: ${studentName}`);
-      // console.log(`challengedStudent: ${challengedStudent}`);
-      // console.log(`challengingStudentScore:${score}`);
-      // console.log(`challengedStudentScore:""`);
-      // console.log(`level: ${question[0].data().level}`);
-      // console.log(`questionId: ${question[0].data().id}`);
-      // console.log(`status: pending`);
-
       // get the current timestamp
       const timestamp: string = Date.now().toString();
       // create a pointer to our document
@@ -124,8 +126,12 @@ const Quiz: React.FC<Props> = ({ studentName }) => {
     }
   };
 
-  const loadQuestion = async (level: string) => {
+  const loadQuestion = async (level: 'easy' | 'medium' | 'hard' | undefined) => {
+
+    if (!level) return
+
     console.log('click');
+    setLevel(level)
     const questionQuery = query(
       questionCollection,
       where('level', '==', level),
@@ -145,93 +151,83 @@ const Quiz: React.FC<Props> = ({ studentName }) => {
   };
 
   return (
-    <div>
-      <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-        <button
-          className="btn btn-blue"
-          onClick={() => loadQuestion('easy')}>
-          Easy
-        </button>
-        <br />
-        <br />
-        <button
-          className="btn btn-blue"
-          onClick={() => loadQuestion('medium')}>
-          Medium
-        </button>
-        <br />
-        <br />
-        <button
-          className="btn btn-blue"
-          onClick={() => loadQuestion('hard')}>
-          Hard
-        </button>
-        <br />
-        <br />
-        <button className="btn btn-green">socre: {score}</button>
-        <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
-          {/* <form onSubmit={handleQuizSubmit}> */}
-          <h1>Quiz</h1>
-          {question.map((data) => (
-            <div key={data.id} className="flex flex-col gap-y-2">
-              <h3>{data.data().value}</h3>
-              {data.data().answers &&
-                data.data().answers.map((answer:string) => (
-                  <button
-                    onClick={(e) => setOption(answer)}
-                    key={answer}
-                    className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    {answer}
-                  </button>
+    <div className='flex flex-col items-center'>
+      <span className='text-4xl font-bold mb-10'>Your Score: {score}</span>
+      {!challengedStudent && !isQuizSubmited &&
+        <>
+          <span className='self-start'>
+            Select a level:
+          </span>
+          <div className="w-full flex justify-around gap-8 text-2xl mt-2">
 
-                  // <option key={student.id}>{student.data().name}</option>
-                ))}
-            </div>
-          ))}
-          <br />
-          <button onClick={handleQuizSubmit}>Submit</button>
-          {/* </form> */}
-          {/* <form onSubmit={handleQuizSubmit}>
-          {question.map((data) => (
-            <>
-              <div key={data.id}>{data.data().value}</div>
-              <select
-                className="block appearance-none w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                id="grid-state"
-                onChange={(e) => setOption(e.target.value)}>
-                {data.data().answers &&
-                  data
-                    .data()
-                    .answers.map((answer) => <option>{answer}</option>)}
-              </select>
-            </>
-       
-          <br></br>
-          <br></br>
-          <input type="submit" />
-        </form> */}
-          <br /> <br />
-          {isQuizSubmited && (
-            <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
-              <h1>Select name</h1>
-              <div className="flex flex-col gap-y-2">
-                {students.map((student) => (
-                  <button
-                    onClick={(e) => setChallengedStudent(student.data().name)}
-                    key={student.id}
-                    className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                    {student.data().name}
-                  </button>
+            <button
+              className={`border border-indigo-500 p-5 rounded-xl ${level === 'easy' ? 'bg-indigo-500' : ''
+                }`}
+              onClick={() => loadQuestion('easy')}>
+              Easy
+            </button>
+            <button
+              className={`border border-indigo-500 p-5 rounded-xl ${level === 'medium' ? 'bg-indigo-500' : ''
+                }`}
+              onClick={() => loadQuestion('medium')}>
+              Medium
+            </button>
+            <button
+              className={`border border-indigo-500 p-5 rounded-xl ${level === 'hard' ? 'bg-indigo-500' : ''
+                }`}
+              onClick={() => loadQuestion('hard')}>
+              Hard
+            </button>
+          </div>
+        </>
+      }
 
-                  // <option key={student.id}>{student.data().name}</option>
-                ))}
-              </div>
-              <button onClick={handleChallengeSubmit}>Submit challenge</button>
-            </div>
-          )}
-          <div />
+
+      {level && question && !isQuizSubmited && <div className="mt-10 font-bold text-center flex flex-col gap-2 w-full m-auto">
+        <h1 className='text-2xl font-bold'>Quiz</h1>
+        {question.map((data) => (
+          <div key={data.id} className="flex flex-col gap-2 justify-center">
+            <h3 className='font-medium self-start'>{data.data().value}</h3>
+            {data.data().answers &&
+              data.data().answers.map((answer: string) => (
+                <button
+                  onClick={(e) => setOption(answer)}
+                  key={answer}
+                  className={`border border-indigo-500 p-4 rounded-xl ${option === answer ? 'bg-indigo-500' : ''
+                    } `}>
+                  {answer}
+                </button>
+
+                // <option key={student.id}>{student.data().name}</option>
+              ))}
+          </div>
+        ))}
+        <div className='flex justify-around gap-2'>
+          <button className='p-5 bg-indigo-500 self-start rounded-xl active:border-indigo-500' onClick={() => handleQuizSubmit()}>Submit</button>
+          <button className='p-5 bg-indigo-500 self-start rounded-xl active:border-indigo-500' onClick={() => handleQuizSubmit(true)}>Submit &amp; Challenge</button>
         </div>
-      </div>
+
+        <div />
+      </div>}
+      {isQuizSubmited && (
+        <div className="mt-10 font-bold flex flex-col gap-2 m-auto">
+          <h1>Select player: </h1>
+          <div className="flex flex-col gap-y-2">
+            {students.map((student) => (
+              <button
+                onClick={() => setChallengedStudent(student.data().name)}
+                key={student.id}
+                className={`font-semibold text-center p-4 border border-indigo-500 rounded-xl ${challengedStudent === student.data().name ? 'bg-indigo-500' : ''
+                  }`}>
+                {student.data().name}
+              </button>
+
+              // <option key={student.id}>{student.data().name}</option>
+            ))}
+          </div>
+          <button className='p-5 self-center mt-4 rounded-xl bg-indigo-500 border border-indigo-500 active:bg-transparent' onClick={handleChallengeSubmit}>Submit challenge</button>
+        </div>
+      )}
     </div>
   );
 };

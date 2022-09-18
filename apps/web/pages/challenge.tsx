@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Dispatch, SetStateAction } from 'react';
 import { firestore } from '../firebase';
 import { setDoc, onSnapshot } from 'firebase/firestore';
 
@@ -13,49 +13,111 @@ import {
   where,
   updateDoc,
 } from '@firebase/firestore';
+import { useAddress, useMetamask } from '@thirdweb-dev/react';
 
 interface Props {
   challenges: QueryDocumentSnapshot<DocumentData>[];
   studentName: string;
+  setIsChallenged: Dispatch<SetStateAction<boolean>>;
 }
 
-const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
+const Challenge: React.FC<Props> = ({ setIsChallenged }) => {
   const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [score, setScore] = useState<number| null>(null);
+  const [score, setScore] = useState<number | null>(null);
   const [option, setOption] = useState<string>('');
-  const [challangeAlret, setChallengeAlert] = useState<boolean>(true);
+  const [challangeAlret, setChallengeAlert] = useState<boolean>(false);
   const [acceptChallenge, setAcceptChallenge] = useState<boolean>(false);
   const [solvingAlert, setSolvingAlert] = useState<string>('');
+  const [challenges, setChallenges] = useState<
+    QueryDocumentSnapshot<DocumentData>[]
+  >([]);
+  const [doneChallenge, setDoneChallenge] = useState<
+    QueryDocumentSnapshot<DocumentData>[]
+  >([]);
+
+  const address = useAddress()
+  const connect = useMetamask()
 
   const questionCollection = collection(firestore, 'questions');
+  const challengesCollection = collection(firestore, 'challenges');
+
   useEffect(() => {
-    loadQuestion();
-  }, [acceptChallenge]);
+    connect()
+  }, [])
+
+  useEffect(() => {
+    if (challenges.length > 0) {
+      setChallengeAlert(true);
+    }
+  }, [challenges]);
+
+  
+
+
+
 
   useEffect(() => {
     if (score !== null) {
-      console.log('socre challage');
       console.log(score);
-      const completeChallange = async () => {};
+      const completeChallange = async () => { };
 
       completeChallange();
       if (score !== null && challenges[0]) {
         console.log(challenges[0].data().fromScore);
         console.log(score);
         if (score > parseInt(challenges[0].data().fromScore)) {
-          setSolvingAlert('congratulation you won');
-          console.log('you can now increment value on the blockchain');
+          setSolvingAlert('You won the challenge! 🥳');
         } else if (score < challenges[0].data().fromScore) {
-          setSolvingAlert('opps you lose');
+          setSolvingAlert('Better luck next time 😞');
         } else if (score == challenges[0].data().fromScore) {
-          setSolvingAlert('socre level');
+          setSolvingAlert('Close Call! 😓');
         }
       }
     }
   }, [score]);
+
+  useEffect(() => {
+    const unsubscribed = onSnapshot(challengesCollection, (snapshot) => {
+      console.log(address)
+
+      if (address) {
+        setChallenges(
+          // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
+          snapshot.docs.filter(
+            (doc) =>
+            doc.data().status == 'pending' && doc.data().to == address 
+          )
+        );
+      }
+
+      
+      setChallengeAlert(true)
+
+      console.log('hello khan', challenges);
+    });
+
+    const unsubscribedCompleted = onSnapshot(
+      challengesCollection,
+      (snapshot) => {
+        setDoneChallenge(
+          // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
+          snapshot.docs.filter(
+            (doc) =>
+              doc.data().status == 'done' && doc.data().from == address
+          )
+        );
+        console.log('hello khan 2', doneChallenge);
+      }
+    );
+
+    return () => {
+      unsubscribed();
+      unsubscribedCompleted();
+    };
+  }, [address]);
+  
 
   // const selectedOption = (e) => {
   //   console.log(e.target.value);
@@ -76,17 +138,23 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
 
     console.log('var value' + _score);
 
-    const _challenge = doc(firestore, `challenges/${challenges[0].id}`);
+    const _challenge = doc(firestore, `challenges/${challenges[0]?.id}`);
 
     // update the doc by setting done to true
     await updateDoc(_challenge, {
       status: 'done',
       toScore: _score,
     });
+
+    setChallengeAlert(false)
+    setAcceptChallenge(false)
+    setIsChallenged(false)
   };
 
   const loadQuestion = async () => {
     if (challenges[0]) {
+
+      console.log(challenges[0])
       const questionQuery = query(
         questionCollection,
         where('__name__', '==', challenges[0].data().questionId),
@@ -98,11 +166,14 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
         result.push(snapshot);
       });
 
+      console.log(result)
+
       setQuestion(result);
     }
   };
 
   const onAcceptChalleng = () => {
+    loadQuestion()
     setChallengeAlert(false);
     setAcceptChallenge(true);
   };
@@ -112,66 +183,39 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
   };
 
   return (
-    <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-      {challangeAlret && (
+    <div className="w-full p-40 h-screen">
+      <span className='text-left text-3xl'>
+        {
+          challangeAlret ? 'Challenges you got:' : 'Challenges will show up here: '
+        }
+      </span>
+      {challangeAlret  && (
         <div
-          id="alert-border-1"
-          className="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
+          className="flex justify-around items-center gap-20 p-5 rounded-xl mt-10 border border-indigo-500 "
           role="alert">
-          <svg
-            className="flex-shrink-0 w-5 h-5 text-blue-700"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            xmlns="http://www.w3.org/2000/svg">
-            <path
-              fill-rule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clip-rule="evenodd"></path>
-          </svg>
 
-          <div className="ml-3 text-sm font-medium text-blue-700">
-            Hey <span className="font-semibold"> {studentName} </span> you are
+
+          <div className="">
+            Hey <span className="font-semibold"> {address} </span> you are challenged.
           </div>
 
-          <button
-            type="button"
-            onClick={onRejectChallange}
-            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
-            data-dismiss-target="#alert-border-1"
-            aria-label="Close">
-            <span className="sr-only">Dismiss</span>
-            <svg
-              aria-hidden="true"
-              className="w-5 h-5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                fill-rule="evenodd"
-                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                clip-rule="evenodd"></path>
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={onAcceptChalleng}
-            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
-            data-dismiss-target="#alert-border-1"
-            aria-label="Close">
-            <span className="sr-only">Dismiss</span>
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </button>
+          <div className='flex gap-28 justify-between'>
+            <button
+              type="button"
+              onClick={onRejectChallange}
+              className="bg-indigo-500 p-4 rounded-xl border border-indigo-500 active:bg-transparent"
+              aria-label="Close">
+              <span className="">Dismiss</span>
+            </button>
+            <button
+              type="button"
+              onClick={onAcceptChalleng}
+              className="bg-indigo-500 p-4 rounded-xl border border-indigo-500 active:bg-transparent"
+              aria-label="Close">
+              <span className="">Accept</span>
+            </button>
+
+          </div>
         </div>
       )}
       {solvingAlert.length > 0 && (
@@ -198,6 +242,7 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
             type="button"
             className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
+            onClick={() => setSolvingAlert('')}
             aria-label="Close">
             <span className="sr-only">Dismiss</span>
             <svg
@@ -214,7 +259,7 @@ const Challenge: React.FC<Props> = ({ challenges, studentName }) => {
           </button>
         </div>
       )}
-      {acceptChallenge && (
+      {acceptChallenge && question.length > 0 && (
         <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
           {/* <form onSubmit={handleQuizSubmit}> */}
           <h1>Quiz</h1>

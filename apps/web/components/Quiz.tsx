@@ -1,4 +1,4 @@
-import React, { useState, useEffect, MouseEventHandler } from 'react';
+import React, { useState, useEffect } from 'react';
 import { firestore } from '../firebase';
 import { setDoc, onSnapshot } from 'firebase/firestore';
 
@@ -12,35 +12,37 @@ import {
   QueryDocumentSnapshot,
   where,
 } from '@firebase/firestore';
+import Challenge from './Challenge';
 
-const Quiz = () => {
-  
-  const [questions, setQuestions] = useState<
+interface Props {
+  studentName: string
+}
+
+const Quiz: React.FC<Props> = ({studentName}) => {
+  const [question, setQuestion] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  
+  const [isChallenged, setIsChallenged] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  
-  const [input, setInput] = useState<String>('ahmad');
-  
-  const [username, setUsername] = useState<String>('');
-  
+  const [score, setScore] = useState<number>(0);
+  const [questionId, setQuestionId] = useState<string>('');
+  const [option, setOption] = useState<string>('');
+  const [challengedStudent, setChallengedStudent] = useState<string>();
+  const [isQuizSubmited, setIsQuizSubmited] = useState<boolean>(false);
   const [challenges, setChallenges] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  
   const [students, setStudents] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  
-  const [quizz, setQuizz] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
+  //   const [quizz, setQuizz] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
 
   const [c, setC] = useState<QueryDocumentSnapshot<DocumentData>[]>([]);
 
   const challengesCollection = collection(firestore, 'challenges');
   const questionCollection = collection(firestore, 'questions');
   const studentsCollection = collection(firestore, 'students');
-  const quizzCollection = collection(firestore, 'quizzes');
+  //   const quizzCollection = collection(firestore, 'quizzes');
 
   useEffect(() => {
     getFriends();
@@ -49,97 +51,185 @@ const Quiz = () => {
   const getFriends = async () => {
     const studentstQuery = query(
       studentsCollection,
-      where('name', '!=', input),
+
       limit(10)
     );
-    const querySnapshot = await getDocs(studentstQuery);
+
+    try {
+      const querySnapshot = await getDocs(studentstQuery);
+      const result: QueryDocumentSnapshot<DocumentData>[] = [];
+      querySnapshot.forEach((snapshot) => {
+        result.push(snapshot);
+      });
+
+      setStudents(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // const selectedOption = (e) => {
+  //   console.log(e.target.value);
+  // };
+
+  const handleQuizSubmit = () => {
+    setIsQuizSubmited(true);
+    let correctAnswer = '';
+
+    console.log(correctAnswer);
+    if (option == question[0].data().correct) {
+      setScore(100);
+    } else {
+      setScore(0);
+    }
+  };
+
+  const handleChallengeSubmit = async () => {
+    console.log('clicked challenge');
+    if (question[0]) {
+      // console.log(`studentName: ${studentName}`);
+      // console.log(`challengedStudent: ${challengedStudent}`);
+      // console.log(`challengingStudentScore:${score}`);
+      // console.log(`challengedStudentScore:""`);
+      // console.log(`level: ${question[0].data().level}`);
+      // console.log(`questionId: ${question[0].data().id}`);
+      // console.log(`status: pending`);
+
+      // get the current timestamp
+      const timestamp: string = String(Date.now());
+      // create a pointer to our document
+      const _challenge = doc(firestore, `challenges/${timestamp}`);
+      // structure the todo data
+      let _quesionId = question[0].id;
+      const challaengeData = {
+        from: studentName,
+        to: challengedStudent,
+        fromScore: score,
+        questionId: _quesionId,
+        toScore: '',
+        status: 'pending',
+      };
+
+      try {
+        //add the document
+        await setDoc(_challenge, challaengeData);
+        //   setC(todoData);
+        //   getChallenges();
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const loadQuestion = async (level: string) => {
+    console.log('click');
+    const questionQuery = query(
+      questionCollection,
+      where('level', '==', level),
+      limit(1)
+    );
+    const querySnapshot = await getDocs(questionQuery);
     const result: QueryDocumentSnapshot<DocumentData>[] = [];
     querySnapshot.forEach((snapshot) => {
       result.push(snapshot);
     });
-    console.log(result);
-    setStudents(result);
-  };
 
-  const getQuizz = async () => {
-    const quizzQuery = query(quizzCollection, limit(1));
-    const querySnapshot = await getDocs(quizzQuery);
-    const result: QueryDocumentSnapshot<DocumentData>[] = [];
-    querySnapshot.forEach((snapshot) => {
-      result.push(snapshot);
+    result.forEach((element) => {
+      setQuestionId(element.id);
     });
-    setQuestions(result);
-  };
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    setUsername(input);
-  };
-
-  const loadQuizz = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent> , level:string) => {
-    // const quizzQuery = query(
-    //   quizzCollection,
-    //   where('level', '==', level),
-    //   limit(10)
-    // );
-    // const querySnapshot = await getDocs(quizzQuery);
-    // const result: QueryDocumentSnapshot<DocumentData>[] = [];
-    // querySnapshot.forEach((snapshot) => {
-    //   result.push(snapshot.doc());
-    // });
-    // result.forEach((abc) => {});
-    // console.log(result);
-    // setQuizz(result);
+    setQuestion(result);
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        <input type="text" onChange={(e) => setInput(e.target.value)} />
-        <input type="submit" />
-      </form>
-
+    <div>
       <div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
-        <label className="block uppercase text-xs font-bold mb-2">
-          Challange Friend
-        </label>
-        <div className="relative">
-          <select
-            className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-            id="grid-state">
-            {students &&
-              students.map((student) => (
-                <option key={student.id}>{student.data().name}</option>
-              ))}
-          </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="fill-current h-4 w-4"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20">
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-            </svg>
-          </div>
+        <button
+          className="btn btn-blue"
+          onClick={() => loadQuestion('easy')}>
+          Easy
+        </button>
+        <br />
+        <br />
+        <button
+          className="btn btn-blue"
+          onClick={() => loadQuestion( 'medium')}>
+          Medium
+        </button>
+        <br />
+        <br />
+        <button
+          className="btn btn-blue"
+          onClick={() => loadQuestion('hard')}>
+          Hard
+        </button>
+        <br />
+        <br />
+        <button className="btn btn-green">socre: {score}</button>
+        <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
+          {/* <form onSubmit={handleQuizSubmit}> */}
+          <h1>Quiz</h1>
+          {question.map((data) => (
+            <div key={data.id} className="flex flex-col gap-y-2">
+              <h3>{data.data().value}</h3>
+              {data.data().answers &&
+                data.data().answers.map((answer: string) => (
+                  <button
+                    onClick={(e) => setOption(answer)}
+                    key={answer}
+                    className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    {answer}
+                  </button>
+
+                  // <option key={student.id}>{student.data().name}</option>
+                ))}
+            </div>
+          ))}
+          <br />
+          <button onClick={handleQuizSubmit}>Submit</button>
+          {/* </form> */}
+          {/* <form onSubmit={handleQuizSubmit}>
+          {question.map((data) => (
+            <>
+              <div key={data.id}>{data.data().value}</div>
+              <select
+                className="block appearance-none w-1/2 bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                id="grid-state"
+                onChange={(e) => setOption(e.target.value)}>
+                {data.data().answers &&
+                  data
+                    .data()
+                    .answers.map((answer) => <option>{answer}</option>)}
+              </select>
+            </>
+       
+          <br></br>
+          <br></br>
+          <input type="submit" />
+        </form> */}
+          <br /> <br />
+          {isQuizSubmited && (
+            <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
+              <h1>Select name</h1>
+              <div className="flex flex-col gap-y-2">
+                {students.map((student) => (
+                  <button
+                    onClick={(e) => setChallengedStudent(student.data().name)}
+                    key={student.id}
+                    className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+                    {student.data().name}
+                  </button>
+
+                  // <option key={student.id}>{student.data().name}</option>
+                ))}
+              </div>
+              <button onClick={handleChallengeSubmit}>Submit challenge</button>
+            </div>
+          )}
+          <div />
         </div>
       </div>
-
-      <button className="btn btn-blue" onClick={(e) => loadQuizz(e, 'easy')}>
-        Easy
-      </button>
-      <button className="btn btn-blue" onClick={(e) => loadQuizz(e, 'medium')}>
-        Medium
-      </button>
-      <button className="btn btn-blue" onClick={(e) => loadQuizz(e, 'hard')}>
-        Easy
-      </button>
-
-      <div className="flex flex-col w-full">
-        <div className="flex items-center w-full py-4 pl-5 m-2 ml-0 space-x-2 border-2 cursor-pointer border-white/10 rounded-xl bg-white/5">
-          <input type="radio" className="w-6 h-6 bg-black" />
-          <p className="ml-6 text-white">True</p>
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 

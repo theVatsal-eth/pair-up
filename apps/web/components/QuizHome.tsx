@@ -72,9 +72,12 @@ const QuizHome = () => {
         if (element.data().fromScore > element.data().toScore) {
           setGameStatusMessage('Congratulation you won :D');
         } else if (element.data().fromScore < element.data().toScore) {
+
+
           setGameStatusMessage('You lost :(');
         } else {
           setGameStatusMessage('A Tie! :)');
+
         }
       });
     }

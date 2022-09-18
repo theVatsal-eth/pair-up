@@ -13,20 +13,20 @@ import {
   where,
 } from '@firebase/firestore';
 import Challenge from './Challenge';
-import Quiz from './Quize';
+import Quiz from './Quiz';
 
 const QuizHome = () => {
-  const [isChallenged, setIsChallenged] = useState<Boolean>(false);
-  const [loading, setLoading] = useState<Boolean>(true);
-  const [input, setInput] = useState<String>('');
+  const [isChallenged, setIsChallenged] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [input, setInput] = useState<string>('');
   const [doneChallenge, setDoneChallenge] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [studentName, setStudentName] = useState<String>('');
+  const [studentName, setStudentName] = useState<string>('');
   const [challenges, setChallenges] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
-  const [gameStatusMesage, setGameStatusMessage] = useState<String>('');
+  const [gameStatusMesage, setGameStatusMessage] = useState<string>('');
   const [students, setStudents] = useState<
     QueryDocumentSnapshot<DocumentData>[]
   >([]);
@@ -35,7 +35,7 @@ const QuizHome = () => {
   const studentsCollection = collection(firestore, 'students');
 
   useEffect(() => {
-    const ubsubscribed = onSnapshot(challengesCollection, (snapshot) => {
+    const unsubscribed = onSnapshot(challengesCollection, (snapshot) => {
       setChallenges(
         // snapshot.docs.map((doc) => ({ id: doc.id, to: doc.data().to }))
         snapshot.docs.filter(
@@ -46,7 +46,7 @@ const QuizHome = () => {
       console.log('hello khan');
     });
 
-    const ubsubscribedCompleted = onSnapshot(
+    const unsubscribedCompleted = onSnapshot(
       challengesCollection,
       (snapshot) => {
         setDoneChallenge(
@@ -61,8 +61,8 @@ const QuizHome = () => {
     );
 
     return () => {
-      ubsubscribed();
-      ubsubscribedCompleted();
+      unsubscribed();
+      unsubscribedCompleted();
     };
   }, [studentName]);
 
@@ -70,11 +70,11 @@ const QuizHome = () => {
     if (doneChallenge.length > 0) {
       doneChallenge.forEach((element) => {
         if (element.data().fromScore > element.data().toScore) {
-          setGameStatusMessage('Congratulation you won');
+          setGameStatusMessage('Congratulation you won :D');
         } else if (element.data().fromScore < element.data().toScore) {
-          setGameStatusMessage('you loss');
+          setGameStatusMessage('You lost :(');
         } else {
-          setGameStatusMessage('score is level');
+          setGameStatusMessage('A Tie! :)');
         }
       });
     }
@@ -120,10 +120,10 @@ const QuizHome = () => {
       {gameStatusMesage.length > 0 && (
         <div
           id="alert-border-1"
-          class="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
+          className="flex p-4 mb-4 bg-blue-100 border-t-4 border-blue-500 dark:bg-blue-200"
           role="alert">
           <svg
-            class="flex-shrink-0 w-5 h-5 text-blue-700"
+            className="flex-shrink-0 w-5 h-5 text-blue-700"
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg">
@@ -133,19 +133,19 @@ const QuizHome = () => {
               clip-rule="evenodd"></path>
           </svg>
 
-          <div class="ml-3 text-sm font-medium text-blue-700">
+          <div className="ml-3 text-sm font-medium text-blue-700">
             {gameStatusMesage}
           </div>
 
           <button
             type="button"
-            class="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
+            className="ml-auto -mx-1.5 -my-1.5 bg-blue-100 dark:bg-blue-200 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200 dark:hover:bg-blue-300 inline-flex h-8 w-8"
             data-dismiss-target="#alert-border-1"
             aria-label="Close">
-            <span class="sr-only">Dismiss</span>
+            <span className="sr-only">Dismiss</span>
             <svg
               aria-hidden="true"
-              class="w-5 h-5"
+              className="w-5 h-5"
               fill="currentColor"
               viewBox="0 0 20 20"
               xmlns="http://www.w3.org/2000/svg">

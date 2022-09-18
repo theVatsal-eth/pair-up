@@ -1,6 +1,6 @@
 import React from "react"
 import Navbar from "./Navbar";
-import QuizHome from "./QuizHome";
+import QuizHome from "../pages/quiz";
 
 const Home = () => {
     return(

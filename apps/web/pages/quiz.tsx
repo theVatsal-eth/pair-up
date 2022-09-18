@@ -12,8 +12,11 @@ import {
   QueryDocumentSnapshot,
   where,
 } from '@firebase/firestore';
-import Challenge from './Challenge';
-import Quiz from './Quiz';
+import Challenge from './challenge';
+import Quiz from '../components/Quiz';
+import { useAddress } from '@thirdweb-dev/react';
+import User from '../components/User';
+
 
 const QuizHome = () => {
   const [isChallenged, setIsChallenged] = useState<boolean>(false);
@@ -33,6 +36,8 @@ const QuizHome = () => {
 
   const challengesCollection = collection(firestore, 'challenges');
   const studentsCollection = collection(firestore, 'students');
+
+  const address = useAddress()
 
   useEffect(() => {
     const unsubscribed = onSnapshot(challengesCollection, (snapshot) => {
@@ -104,6 +109,8 @@ const QuizHome = () => {
         result.push(snapshot);
       });
 
+
+
       setStudents(result);
     } catch (error) {
       console.log(error);
@@ -116,7 +123,7 @@ const QuizHome = () => {
   // };
 
   return (
-    <div>
+    <div className='flex justify-center'>
       {gameStatusMesage.length > 0 && (
         <div
           id="alert-border-1"
@@ -158,43 +165,31 @@ const QuizHome = () => {
         </div>
       )}
 
-      {studentName ? (
-        <div>
-          <h1>Student name :{studentName}</h1>
-          {isChallenged ? (
-            <Challenge challenges={challenges} studentName={studentName} />
-          ) : (
-            <Quiz studentName={studentName} />
-          )}
-        </div>
-      ) : (
-        <div className="mt-10 font-bold text-center flex flex-col gap-y-2 w-1/2 m-auto">
-          <h1>Select name</h1>
+      
           <div className="flex flex-col gap-y-2">
-            {students.map((student) => (
-              <button
-                onClick={(e) => setStudentName(student.data().name)}
-                key={student.id}
-                className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
-                {student.data().name}
-              </button>
-
-              // <option key={student.id}>{student.data().name}</option>
-            ))}
+            <User/>
           </div>
-        </div>
-
-        // <form className="mt-10" onSubmit={nameSubmit}>
-        //   <input
-        //     onChange={(e) => setInput(e.target.value)}
-        //     className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-        //   />
-
-        //   <input type="submit" />
-        // </form>
-      )}
+      
     </div>
   );
 };
 
 export default QuizHome;
+
+
+// const result: string[] = []
+      // students.forEach((student) => {
+        // students.push(student.data().name)
+      // })
+
+
+      // {students.map((student) => (
+      //   <button
+      //     onClick={(e) => setStudentName(student.data().name)}
+      //     key={student.id}
+      //     className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">
+      //     {student.data().name}
+      //   </button>
+
+      //   // <option key={student.id}>{student.data().name}</option>
+      // ))}

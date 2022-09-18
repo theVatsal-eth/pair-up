@@ -12,11 +12,11 @@ const Navbar = () => {
                 </div>
                 <div className="flex text-xl text-slate-300  w-[60%]">
                     <ul className=" list-none flex w-full justify-around self-center">
-                        <Link href="/"><li className=" flex h-min self-center ">Home</li></Link>
-                        <Link href="report"><li className=" flex h-min self-center ">Report</li></Link>
-                        <a><li className=" flex h-min self-center ">Players</li></a>
-                        <a><li className=" flex h-min self-center ">Challenges</li></a>
-                        <a><li className=" flex h-min self-center ">About</li></a>
+                        <Link href="/"><li className=" flex h-min self-center cursor-pointer ">Home</li></Link>
+                        <Link href="report"><li className=" flex h-min self-center cursor-pointer ">Report</li></Link>
+                        <Link href="quiz"><li className=" flex h-min self-center cursor-pointer ">Quiz</li></Link>
+                        <a><li className=" flex h-min self-center cursor-pointer ">Players</li></a>
+                        <a><li className=" flex h-min self-center cursor-pointer ">About</li></a>
                     </ul>
                 </div>
                 <div className="flex h-max items-center z-20 connect">

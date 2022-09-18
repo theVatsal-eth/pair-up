@@ -5,7 +5,7 @@ import Link from "next/link";
 const Navbar = ()=>{ 
     return(
         <div className="nav flex align-middle justify-between fixed inset-0   min-w-full h-20 px-20 py-12">
-            <div className="  hover:text-indigo-400      transition-colors logo w-[25%] text-4xl font-bold tracking-wide font-Poppins text-[#6A67E5] flex h-min self-center hover:cursor-pointer">
+            <div className="  hover:text-indigo-400 transition-colors logo w-[25%] text-4xl font-bold tracking-wide font-Poppins text-[#6A67E5] flex h-min self-center hover:cursor-pointer">
                 Quiz Dapp</div>
             <div className="nav-options flex text-xl text-slate-300  w-[60%]">
                 <ul className=" list-none flex w-full justify-around self-center">
